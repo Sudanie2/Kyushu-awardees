@@ -3,7 +3,7 @@ name: Generate RSS Feed for Kyushu University Research News
 on:
   schedule:
     - cron: "10 1 * * *" # UTC 01:10 = JST 10:10
-  workflow_dispatch: # 手動実行も可能
+  workflow_dispatch:
 
 jobs:
   build:
@@ -15,10 +15,17 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Install dependencies
+      - name: Install dependencies (jq)
         run: |
           sudo apt-get update
-          sudo apt-get install -y jq pup
+          sudo apt-get install -y jq
+
+      - name: Install pup (HTML parser)
+        run: |
+          curl -sL "https://github.com/ericchiang/pup/releases/download/v0.4.0/pup_linux_amd64.zip" -o pup.zip
+          unzip pup.zip
+          chmod +x pup
+          sudo mv pup /usr/local/bin/
 
       - name: Fetch previous RSS file
         run: |
@@ -46,7 +53,7 @@ jobs:
           echo '<language>ja</language>' >> rss.xml
 
           # 記事データを抽出
-          cat news.html | pup 'div.c-card c-card--has-hover p-research-topic-card json{}' | jq -c '.[]' | while read -r item; do
+          pup 'div.c-card c-card--has-hover p-research-topic-card json{}' < news.html | jq -c '.[]' | while read -r item; do
             title=$(echo "$item" | jq -r '.children[] | select(.class == "c-title__main") | .text')
             link=$(echo "$item" | jq -r '.children[] | select(.class == "c-card__over-wrap-link") | .href')
             pubDate=$(echo "$item" | jq -r '.children[] | select(.class == "c-date") | .datetime' | xargs -I {} date --date="{}" -R)
