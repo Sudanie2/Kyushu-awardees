@@ -15,6 +15,8 @@ fg.title('九州大学 研究成果 新着RSS')
 fg.link(href='https://pr-platform.kyushu-u.ac.jp/research/research-topics/research-results/')
 fg.language('ja')
 
+fg.description('九州大学の研究成果に関する新着情報フィード')
+
 for title_main, title_sub in zip(
     soup.select('.c-title__main'),
     soup.select('.c-title__sub')
