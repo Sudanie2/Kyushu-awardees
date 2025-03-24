@@ -1,6 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
-from datetime import datetime
+from datetime import datetime, timezone  # ← 追加
 import hashlib
 from feedgen.feed import FeedGenerator
 
@@ -28,6 +28,6 @@ for title_main, title_sub in zip(
     fe.title(full_title)
     fe.description(sub_title)
     fe.link(href='https://pr-platform.kyushu-u.ac.jp/research/research-topics/research-results/')
-    fe.pubDate(datetime.now().isoformat())
+    fe.pubDate(datetime.now(timezone.utc))  # ← 修正
 
 fg.rss_file('rss.xml')
